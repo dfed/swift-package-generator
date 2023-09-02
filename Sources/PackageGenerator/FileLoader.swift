@@ -18,4 +18,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-GenerateCommand.main()
+import Foundation
+import SwiftShell
+
+protocol FileLoader {
+    /// - Parameters:
+    ///   - name: The name of the files to find.
+    ///   - directory: The root directory within which to look.
+    /// - Returns: The contents of the files matching the name.
+    func loadAllFiles(named name: String, inDirectory directory: String) throws -> [String]
+}
+
+final class DefaultFileLoader: FileLoader {
+
+    // MARK: Initialization
+
+    init() {}
+
+    // MARK: FileLoader
+
+    func loadAllFiles(named name: String, inDirectory directory: String) throws -> [String] {
+        try Process.execute(
+            """
+            find \(directory) -type f -name "\(name)"
+            """,
+            within: .pwd
+        )
+        .split(separator: "\n")
+        .map { try String(contentsOfFile: String($0)) }
+    }
+}
