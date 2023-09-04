@@ -20,6 +20,7 @@
 
 import SwiftSyntax
 
+/// A syntax visitor that undertsands variable declarations.
 final class VariableSyntaxVisitor: SyntaxVisitor {
 
     override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
@@ -40,7 +41,7 @@ final class VariableSyntaxVisitor: SyntaxVisitor {
 
     private final class PatternSyntaxVisitor: SyntaxVisitor {
         override func visit(_ node: IdentifierPatternSyntax) -> SyntaxVisitorContinueKind {
-            key = PackageParameter(rawValue: node.identifier.text)
+            label = PackageParameter(rawValue: node.identifier.text)
             return .skipChildren
         }
 
@@ -49,13 +50,13 @@ final class VariableSyntaxVisitor: SyntaxVisitor {
             return .skipChildren
         }
 
-        private(set) var key: PackageParameter?
+        private(set) var label: PackageParameter?
         private(set) var assignedValue: String = ""
 
         var packageProperty: PackageArgument? {
-            guard let key else { return nil }
+            guard let label else { return nil }
             return PackageArgument(
-                key: key,
+                label: label,
                 value: assignedValue)
         }
     }

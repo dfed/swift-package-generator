@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/// Generates a `Package.swift` file from `PackageMethods.swift` and `Subpackage.swift`.
 public final class PackageContentsGenerator {
 
     // MARK: Initialization
@@ -46,7 +47,12 @@ public final class PackageContentsGenerator {
             .loadAllFiles(
                 named: "PackageMethods.swift",
                 inDirectory: directory)
-            .joined(separator: "\n\n")
+        let allPackageMethods: String
+        if packageMethods.isEmpty {
+            allPackageMethods = ""
+        } else {
+            allPackageMethods = "\n\n\(packageMethods.joined(separator: "\n\n"))"
+        }
 
         return """
         // swift-tools-version: \(swiftToolsVersion)
@@ -60,9 +66,7 @@ public final class PackageContentsGenerator {
                 targets.flatMap { $0 }
             }
         }
-
-        \(packageMethods)
-        """
+        """.appending(allPackageMethods)
     }
 
     // MARK: Private

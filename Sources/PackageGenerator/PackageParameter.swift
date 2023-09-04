@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-/// An enumeration of the parameters to the Package(...) initializer in PackageDescription.
+/// An enumeration of the parameters to the `Package(...)` initializer in PackageDescription.
 enum PackageParameter: String, CaseIterable {
     case name
     case defaultLocalization
@@ -32,7 +32,7 @@ enum PackageParameter: String, CaseIterable {
     case cLanguageStandard
     case cxxLanguageStandard
 
-    /// Takes a series of values for a single key and returns a combined value for use in a generated Package.swift file.
+    /// Takes a series of values for a single parameter label and returns a combined value for use in a generated Package.swift file.
     /// - Parameter values: The values for the Package parameter.
     /// - Returns: A single string representing the combined values for this Package parameter.
     func combinedParameter(from values: [String]) throws -> String {
@@ -54,20 +54,22 @@ enum PackageParameter: String, CaseIterable {
                 .name,
                 .pkgConfig:
             if values.count > 1 {
-                struct TooManyArgumentDefinitionsError: Error {
-                    let key: PackageParameter
-                }
-                throw TooManyArgumentDefinitionsError(key: self)
+                throw TooManyArgumentDefinitionsError(label: self)
 
             } else if let value = values.first {
                 return "\(self.rawValue): \(value)"
 
             } else {
-                struct TooFewArgumentDefinitionsError: Error {
-                    let key: PackageParameter
-                }
-                throw TooFewArgumentDefinitionsError(key: self)
+                throw TooFewArgumentDefinitionsError(label: self)
             }
         }
     }
+}
+
+struct TooManyArgumentDefinitionsError: Error, Equatable {
+    let label: PackageParameter
+}
+
+struct TooFewArgumentDefinitionsError: Error, Equatable {
+    let label: PackageParameter
 }

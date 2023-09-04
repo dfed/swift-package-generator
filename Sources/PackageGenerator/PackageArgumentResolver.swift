@@ -47,7 +47,7 @@ final class PackageDefinitionResolver {
                 let visitor = VariableSyntaxVisitor(viewMode: .sourceAccurate)
                 visitor.walk(syntax)
                 for packageProperty in visitor.packageProperties {
-                    partialResult[packageProperty.key, default: []] += [packageProperty.value]
+                    partialResult[packageProperty.label, default: []] += [packageProperty.value]
                 }
             }
         var packageParameters = [String]()
@@ -56,7 +56,7 @@ final class PackageDefinitionResolver {
             try packageParameters.append(packageParameter.combinedParameter(from: parameters))
         }
 
-        let unindentedPackageDeclaration = """
+        let unformattedPackageDeclaration = """
         let package = Package(
         \(packageParameters.joined(separator: ",\n"))
         )
@@ -64,7 +64,7 @@ final class PackageDefinitionResolver {
 
         // Format the Package declaration so it looks nice.
         let parsedPackageDeclaration = try SyntaxParser.parse(
-            source: unindentedPackageDeclaration
+            source: unformattedPackageDeclaration
         )
         let packageFileSyntax = SourceFileSyntax(
             statements: parsedPackageDeclaration.statements,

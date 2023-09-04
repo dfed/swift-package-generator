@@ -18,7 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/// A representation of the argument label and value in a `Package(...)` initializer.
 struct PackageArgument {
-    let key: PackageParameter
+    let label: PackageParameter
     let value: String
 }
