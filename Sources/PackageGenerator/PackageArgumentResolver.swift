@@ -47,7 +47,7 @@ final class PackageDefinitionResolver {
                 let visitor = VariableSyntaxVisitor(viewMode: .sourceAccurate)
                 visitor.walk(syntax)
                 for packageProperty in visitor.packageProperties {
-                    partialResult[packageProperty.label, default: []] += [packageProperty.value]
+                    partialResult[packageProperty.label, default: []] += packageProperty.values
                 }
             }
         var packageParameters = [String]()
@@ -80,7 +80,7 @@ final class PackageDefinitionResolver {
                 assumingFileURL: nil,
                 to: &packageFileStream)
 
-        return packageFileStream.text
+        return packageFileStream.text.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     // MARK: Private

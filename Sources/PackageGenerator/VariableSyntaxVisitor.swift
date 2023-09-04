@@ -46,18 +46,36 @@ final class VariableSyntaxVisitor: SyntaxVisitor {
         }
 
         override func visit(_ node: InitializerClauseSyntax) -> SyntaxVisitorContinueKind {
-            assignedValue = node.value.description
+            if let arraySyntax = ArrayExprSyntax(node.value) {
+                let arrayVisitor = ArraySyntaxVisitor(viewMode: .sourceAccurate)
+                arrayVisitor.walk(arraySyntax)
+                assignedValues = arrayVisitor.assignedValues
+
+            } else {
+                assignedValues = [node.value.description]
+            }
             return .skipChildren
         }
 
-        private(set) var label: PackageParameter?
-        private(set) var assignedValue: String = ""
-
         var packageProperty: PackageArgument? {
-            guard let label else { return nil }
+            guard let label, let assignedValues else { return nil }
             return PackageArgument(
                 label: label,
-                value: assignedValue)
+                values: assignedValues)
+        }
+
+        // MARK: Private
+
+        private var label: PackageParameter?
+        private var assignedValues: [String]?
+
+        private final class ArraySyntaxVisitor: SyntaxVisitor {
+            override func visit(_ node: ArrayExprSyntax) -> SyntaxVisitorContinueKind {
+                assignedValues = node.elements.map({ $0.withoutTrivia().description })
+                return .skipChildren
+            }
+
+            var assignedValues: [String]?
         }
     }
 }

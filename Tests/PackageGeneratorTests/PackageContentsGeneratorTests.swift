@@ -54,25 +54,15 @@ final class PackageContentsGeneratorTests: XCTestCase {
 
             let package = Package(
                 name: "TestPackage",
-                platforms: .flatten([
-                    [
-                        .macOS(.v13)
-                    ]
-                ]),
-                products: .flatten([
-                    [
-                        .library(
-                            name: "Library"
-                        )
-                    ]
-                ])
+                platforms: [
+                    .macOS(.v13)
+                ],
+                products: [
+                    .library(
+                        name: "Library"
+                    )
+                ]
             )
-
-            extension Array {
-                static func flatten(_ targets: [[Element]]) -> [Element] {
-                    targets.flatMap { $0 }
-                }
-            }
             """
         )
     }
@@ -113,25 +103,15 @@ final class PackageContentsGeneratorTests: XCTestCase {
 
             let package = Package(
                 name: "TestPackage",
-                platforms: .flatten([
-                    [
-                        .macOS(.v13)
-                    ]
-                ]),
-                products: .flatten([
-                    [
-                        .library(
-                            name: "Library"
-                        )
-                    ]
-                ])
+                platforms: [
+                    .macOS(.v13)
+                ],
+                products: [
+                    .library(
+                        name: "Library"
+                    )
+                ]
             )
-
-            extension Array {
-                static func flatten(_ targets: [[Element]]) -> [Element] {
-                    targets.flatMap { $0 }
-                }
-            }
             """
         )
     }
@@ -167,21 +147,11 @@ final class PackageContentsGeneratorTests: XCTestCase {
 
             let package = Package(
                 name: "TestPackage",
-                platforms: .flatten([
-                    [
-                        .macOS(.v13)
-                    ],
-                    [
-                        .iOS(.v13)
-                    ],
-                ])
+                platforms: [
+                    .macOS(.v13),
+                    .iOS(.v13),
+                ]
             )
-
-            extension Array {
-                static func flatten(_ targets: [[Element]]) -> [Element] {
-                    targets.flatMap { $0 }
-                }
-            }
             """
         )
     }
@@ -229,12 +199,6 @@ final class PackageContentsGeneratorTests: XCTestCase {
             let package = Package(
 
                 )
-
-            extension Array {
-                static func flatten(_ targets: [[Element]]) -> [Element] {
-                    targets.flatMap { $0 }
-                }
-            }
 
             // File 1
 

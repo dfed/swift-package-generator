@@ -46,9 +46,9 @@ enum PackageParameter: String, CaseIterable {
                 .swiftLanguageVersions,
                 .targets:
             return """
-                   \(self.rawValue): .flatten([
+                   \(self.rawValue): [
                        \(values.joined(separator: ",\n"))
-                   ])
+                   ]
                    """
         case .defaultLocalization,
                 .name,

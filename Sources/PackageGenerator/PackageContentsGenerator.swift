@@ -61,11 +61,6 @@ public final class PackageContentsGenerator {
         import PackageDescription
 
         \(packageDefinition)
-        extension Array {
-            static func flatten(_ targets: [[Element]]) -> [Element] {
-                targets.flatMap { $0 }
-            }
-        }
         """.appending(allPackageMethods)
     }
 
