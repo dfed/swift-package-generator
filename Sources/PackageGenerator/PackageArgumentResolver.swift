@@ -21,7 +21,7 @@
 import SwiftFormat
 import SwiftFormatConfiguration
 import SwiftSyntax
-import SwiftSyntaxParser
+import SwiftParser
 
 final class PackageDefinitionResolver {
 
@@ -43,7 +43,7 @@ final class PackageDefinitionResolver {
                 inDirectory: directory
             )
             .reduce(into: [PackageParameter: [String]]()) { partialResult, subpackageContents in
-                let syntax = try SyntaxParser.parse(source: subpackageContents)
+                let syntax = Parser.parse(source: subpackageContents)
                 let visitor = VariableSyntaxVisitor(viewMode: .sourceAccurate)
                 visitor.walk(syntax)
                 for packageProperty in visitor.packageProperties {
@@ -63,12 +63,12 @@ final class PackageDefinitionResolver {
         """
 
         // Format the Package declaration so it looks nice.
-        let parsedPackageDeclaration = try SyntaxParser.parse(
+        let parsedPackageDeclaration = Parser.parse(
             source: unformattedPackageDeclaration
         )
         let packageFileSyntax = SourceFileSyntax(
             statements: parsedPackageDeclaration.statements,
-            eofToken: parsedPackageDeclaration.eofToken
+            endOfFileToken: parsedPackageDeclaration.endOfFileToken
         )
         var packageFileStream = TextStreamReceiver()
         var configuration = Configuration()

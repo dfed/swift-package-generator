@@ -71,7 +71,7 @@ final class VariableSyntaxVisitor: SyntaxVisitor {
 
         private final class ArraySyntaxVisitor: SyntaxVisitor {
             override func visit(_ node: ArrayExprSyntax) -> SyntaxVisitorContinueKind {
-                assignedValues = node.elements.map({ $0.withoutTrivia().description })
+                assignedValues = node.elements.map(\.trimmedDescription)
                 return .skipChildren
             }
 
