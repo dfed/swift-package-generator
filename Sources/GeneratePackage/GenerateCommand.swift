@@ -29,7 +29,7 @@ struct GenerateCommand: ParsableCommand {
         commandName: "swift-generate-package",
         abstract: "A command line tool to help generate Package.swift files.")
 
-    @Option(help: "The root directory in which to search for PackageMethods.swift and Subpackage.swift and files")
+    @Option(help: "The root directory in which to search for Subpackage.swift and PackageDescription.swift and files")
     var rootDirectory: String = FileManager.default.currentDirectoryPath
 
     @Option(help: "The swift-tools-version to use in the generated Package.swift file")

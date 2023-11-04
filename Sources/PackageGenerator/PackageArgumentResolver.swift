@@ -33,27 +33,27 @@ final class PackageDefinitionResolver {
 
     // MARK: PackageDefinitionResolver
 
-    /// Creates a `let package = Package(...)` definition from the arguments found in `Subpackage.swift` files in the given directory..
-    /// - Parameter directory: The directory in which to recursively search for the `Subpackage.swift` files.
+    /// Creates a `let package = Package(...)` definition from the arguments found in `PackageDescription.swift` files in the given directory..
+    /// - Parameter directory: The directory in which to recursively search for the `PackageDescription.swift` files.
     /// - Returns: The Package's definition.
-    func resolvePackageFromSubpackageFiles(inDirectory directory: String) throws -> String {
+    func resolvePackageFromDescriptionFiles(inDirectory directory: String) throws -> String {
         let packageParameterToParametersMap = try fileLoader
             .loadAllFiles(
-                named: "Subpackage.swift",
+                named: "PackageDescription.swift",
                 inDirectory: directory
             )
-            .reduce(into: [PackageParameter: [String]]()) { partialResult, subpackageContents in
-                let syntax = Parser.parse(source: subpackageContents)
+            .reduce(into: [PackageParameter: Set<String>]()) { partialResult, packageDescription in
+                let syntax = Parser.parse(source: packageDescription)
                 let visitor = VariableSyntaxVisitor(viewMode: .sourceAccurate)
                 visitor.walk(syntax)
                 for packageProperty in visitor.packageProperties {
-                    partialResult[packageProperty.label, default: []] += packageProperty.values
+                    partialResult[packageProperty.label, default: []].formUnion(packageProperty.values)
                 }
             }
         var packageParameters = [String]()
         for packageParameter in PackageParameter.allCases {
             guard let parameters = packageParameterToParametersMap[packageParameter] else { continue }
-            try packageParameters.append(packageParameter.combinedParameter(from: parameters))
+            try packageParameters.append(packageParameter.combinedParameter(from: parameters.sorted()))
         }
 
         let unformattedPackageDeclaration = """

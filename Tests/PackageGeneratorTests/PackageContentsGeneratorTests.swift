@@ -23,7 +23,7 @@ final class PackageContentsGeneratorTests: XCTestCase {
 
     func test_generatePackageContents_utilizesArgumentsFromSubpackageFiles() throws {
         stubFileLoader.nameAndDirectoryToFilesMap[StubFileLoader.NameAndDirectory(
-            name: "Subpackage.swift",
+            name: "PackageDescription.swift",
             directory: "fake")] = [
                 """
                 let name = "TestPackage"
@@ -69,7 +69,7 @@ final class PackageContentsGeneratorTests: XCTestCase {
 
     func test_generatePackageContents_ignoresTriviaInSubpackageFiles() throws {
         stubFileLoader.nameAndDirectoryToFilesMap[StubFileLoader.NameAndDirectory(
-            name: "Subpackage.swift",
+            name: "PackageDescription.swift",
             directory: "fake")] = [
                 """
                 // The name of the project.
@@ -118,7 +118,7 @@ final class PackageContentsGeneratorTests: XCTestCase {
 
     func test_generatePackageContents_flattensMultiplePlatformsInSubpackageFiles() throws {
         stubFileLoader.nameAndDirectoryToFilesMap[StubFileLoader.NameAndDirectory(
-            name: "Subpackage.swift",
+            name: "PackageDescription.swift",
             directory: "fake")] = [
                 """
                 let name = "TestPackage"
@@ -148,8 +148,8 @@ final class PackageContentsGeneratorTests: XCTestCase {
             let package = Package(
                 name: "TestPackage",
                 platforms: [
-                    .macOS(.v13),
                     .iOS(.v13),
+                    .macOS(.v13),
                 ]
             )
             """
@@ -158,7 +158,7 @@ final class PackageContentsGeneratorTests: XCTestCase {
 
     func test_generatePackageContents_throwsErrorWhenSingleValueParameterFoundInMultipleFiles() throws {
         stubFileLoader.nameAndDirectoryToFilesMap[StubFileLoader.NameAndDirectory(
-            name: "Subpackage.swift",
+            name: "PackageDescription.swift",
             directory: "fake")] = [
                 """
                 let name = "TestPackage"
@@ -177,9 +177,44 @@ final class PackageContentsGeneratorTests: XCTestCase {
         }
     }
 
+    func test_generatePackageContents_deduplicatesDependenciesInSubpackageFiles() throws {
+        stubFileLoader.nameAndDirectoryToFilesMap[StubFileLoader.NameAndDirectory(
+            name: "PackageDescription.swift",
+            directory: "fake")] = [
+                """
+                let dependencies = [
+                    .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0")
+                ]
+                """,
+                """
+                let dependencies = [
+                    .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0")
+                ]
+                """,
+            ]
+        let packageFile = try systemUnderTest.generatePackageContents(
+            fromFilesInDirectory: "fake",
+            usingSwiftToolsVersion: "5.8")
+        XCTAssertEqual(
+            packageFile,
+            """
+            // swift-tools-version: 5.8
+            // The swift-tools-version declares the minimum version of Swift required to build this package.
+
+            import PackageDescription
+
+            let package = Package(
+                dependencies: [
+                    .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0")
+                ]
+            )
+            """
+        )
+    }
+
     func test_generatePackageContents_appendsPackageMethodsFiles() throws {
         stubFileLoader.nameAndDirectoryToFilesMap[StubFileLoader.NameAndDirectory(
-            name: "PackageMethods.swift",
+            name: "Subpackage.swift",
             directory: "fake")] = [
                 "// File 1",
                 "// File 2",

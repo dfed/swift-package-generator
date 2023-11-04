@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-/// Generates a `Package.swift` file from `PackageMethods.swift` and `Subpackage.swift`.
+/// Generates a `Package.swift` file from `Subpackage.swift` and `PackageDescription.swift`.
 public final class PackageContentsGenerator {
 
     // MARK: Initialization
@@ -41,17 +41,17 @@ public final class PackageContentsGenerator {
     ) throws -> String {
         let packageDefinitionResolver = PackageDefinitionResolver(fileLoader: fileLoader)
 
-        let packageDefinition = try packageDefinitionResolver.resolvePackageFromSubpackageFiles(inDirectory: directory)
+        let packageDefinition = try packageDefinitionResolver.resolvePackageFromDescriptionFiles(inDirectory: directory)
 
-        let packageMethods = try fileLoader
+        let subpackages = try fileLoader
             .loadAllFiles(
-                named: "PackageMethods.swift",
+                named: "Subpackage.swift",
                 inDirectory: directory)
-        let allPackageMethods: String
-        if packageMethods.isEmpty {
-            allPackageMethods = ""
+        let allSubpackages: String
+        if subpackages.isEmpty {
+            allSubpackages = ""
         } else {
-            allPackageMethods = "\n\n\(packageMethods.joined(separator: "\n\n"))"
+            allSubpackages = "\n\n\(subpackages.joined(separator: "\n\n"))"
         }
 
         return """
@@ -61,7 +61,7 @@ public final class PackageContentsGenerator {
         import PackageDescription
 
         \(packageDefinition)
-        """.appending(allPackageMethods)
+        """.appending(allSubpackages)
     }
 
     // MARK: Private
