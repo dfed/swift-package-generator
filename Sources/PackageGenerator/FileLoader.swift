@@ -33,18 +33,15 @@ final class FileLoader {
 	///   - directory: The root directory within which to look.
 	/// - Returns: The contents of the files matching the name.
 	func loadAllFiles(named name: String, inDirectory directory: String) throws -> [String] {
+		var files: [String] = []
 		if let enumerator = FileManager.default.enumerator(
 			at: URL(filePath: directory),
 			includingPropertiesForKeys: nil,
 		) {
-			var files: [String] = []
 			for case let fileURL as URL in enumerator where fileURL.lastPathComponent == name {
 				try files.append(String(contentsOf: fileURL))
 			}
-			return files
-		} else {
-			struct CouldNotEnumerateDirectory: Error {}
-			throw CouldNotEnumerateDirectory()
 		}
+		return files
 	}
 }
