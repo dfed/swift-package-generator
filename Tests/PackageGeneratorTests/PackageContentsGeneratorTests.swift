@@ -242,11 +242,11 @@ final class PackageContentsGeneratorTests: XCTestCase {
 			// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 			import PackageDescription
-			
+
 			// File 1
-			
+
 			// File 2
-			
+
 			// File 3
 
 			let package = Package(
