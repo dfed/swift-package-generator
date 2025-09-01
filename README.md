@@ -16,7 +16,7 @@ swift-package-generator enables distributing your proejct definition over multip
 
 SwiftPackageGenerator scans your project directory for:
 
-1. **PackageDescription.swift files** - Contains package configuration arguments like `name`, `platforms`, `products`, `dependencies`, and `targets`
+1. **PackageDescription.swift files** - Contains package configuration arguments like `name`, `platforms`, `products`, `dependencies`, and `targets`.
 2. **Subpackage.swift files** - Contains shared utilities, extensions, and helper functions that can be reused across your package.
 
 ## Getting Started
