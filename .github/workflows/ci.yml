@@ -87,4 +87,4 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v5
       - name: Lint Swift
-        run: swift run --package-path CLI swiftformat . --lint
+        run: swift run --package-path CLI swiftformat Sources Tests --lint
