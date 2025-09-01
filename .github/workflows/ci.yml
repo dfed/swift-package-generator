@@ -65,6 +65,8 @@ jobs:
         uses: actions/checkout@v5
       - name: Generate Example Package
         run: swift run swift-generate-package --root-directory Example/
+      - name: Ensure Package.swift is unchanged
+        run: git diff --exit-code --quiet
       - name: Build Example
         run: swift test --package-path Example/
   readme-validation:
