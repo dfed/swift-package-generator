@@ -1,27 +1,29 @@
+import Testing
+
 @testable import PackageGenerator
-import XCTest
 
-final class PackageContentsGeneratorTests: XCTestCase {
-	// MARK: XCTestCase
+struct PackageContentsGeneratorTests {
+	// MARK: Initialization
 
-	override func setUp() {
-		super.setUp()
+	init() {
 		stubFileLoader = StubFileLoader()
 		systemUnderTest = PackageContentsGenerator(fileLoader: stubFileLoader)
 	}
 
 	// MARK: Behavior Tests
 
-	func test_generatePackageContents_includesInputSwiftToolsVersion() throws {
+	@Test
+	func generatePackageContents_includesInputSwiftToolsVersion() throws {
 		let packageFile = try systemUnderTest.generatePackageContents(
 			fromFilesInDirectory: "fake",
 			usingSwiftToolsVersion: "6.0",
 		)
-		let swiftToolsVersionLine = try XCTUnwrap(packageFile.split(separator: "\n").first)
-		XCTAssertEqual(swiftToolsVersionLine, "// swift-tools-version: 6.0")
+		let swiftToolsVersionLine = try #require(packageFile.split(separator: "\n").first)
+		#expect(swiftToolsVersionLine == "// swift-tools-version: 6.0")
 	}
 
-	func test_generatePackageContents_utilizesArgumentsFromSubpackageFiles() throws {
+	@Test
+	func generatePackageContents_utilizesArgumentsFromSubpackageFiles() throws {
 		stubFileLoader.nameAndDirectoryToFilesMap[StubFileLoader.NameAndDirectory(
 			name: "PackageDescription.swift",
 			directory: "fake",
@@ -32,6 +34,11 @@ final class PackageContentsGeneratorTests: XCTestCase {
 			"""
 			let platforms = [
 				.macOS(.v13)
+			]
+			""",
+			"""
+			let targets = [
+				"Sample",
 			]
 			""",
 			"""
@@ -46,30 +53,31 @@ final class PackageContentsGeneratorTests: XCTestCase {
 			fromFilesInDirectory: "fake",
 			usingSwiftToolsVersion: "6.0",
 		)
-		XCTAssertEqual(
-			packageFile,
-			"""
-			// swift-tools-version: 6.0
-			// The swift-tools-version declares the minimum version of Swift required to build this package.
+		#expect(packageFile == """
+		// swift-tools-version: 6.0
+		// The swift-tools-version declares the minimum version of Swift required to build this package.
 
-			import PackageDescription
+		import PackageDescription
 
-			let package = Package(
-				name: "TestPackage",
-				platforms: [
-					.macOS(.v13)
-				],
-				products: [
-					.library(
-						name: "Library"
-					)
-				]
-			)
-			""",
+		let package = Package(
+			name: "TestPackage",
+			platforms: [
+				.macOS(.v13)
+			],
+			products: [
+				.library(
+					name: "Library"
+				)
+			],
+			targets: [
+				"Sample"
+			].flatMap(\\.self)
 		)
+		""")
 	}
 
-	func test_generatePackageContents_ignoresTriviaInSubpackageFiles() throws {
+	@Test
+	func generatePackageContents_ignoresTriviaInSubpackageFiles() throws {
 		stubFileLoader.nameAndDirectoryToFilesMap[StubFileLoader.NameAndDirectory(
 			name: "PackageDescription.swift",
 			directory: "fake",
@@ -97,30 +105,28 @@ final class PackageContentsGeneratorTests: XCTestCase {
 			fromFilesInDirectory: "fake",
 			usingSwiftToolsVersion: "6.0",
 		)
-		XCTAssertEqual(
-			packageFile,
-			"""
-			// swift-tools-version: 6.0
-			// The swift-tools-version declares the minimum version of Swift required to build this package.
+		#expect(packageFile == """
+		// swift-tools-version: 6.0
+		// The swift-tools-version declares the minimum version of Swift required to build this package.
 
-			import PackageDescription
+		import PackageDescription
 
-			let package = Package(
-				name: "TestPackage",
-				platforms: [
-					.macOS(.v13)
-				],
-				products: [
-					.library(
-						name: "Library"
-					)
-				]
-			)
-			""",
+		let package = Package(
+			name: "TestPackage",
+			platforms: [
+				.macOS(.v13)
+			],
+			products: [
+				.library(
+					name: "Library"
+				)
+			]
 		)
+		""")
 	}
 
-	func test_generatePackageContents_flattensMultiplePlatformsInSubpackageFiles() throws {
+	@Test
+	func generatePackageContents_flattensMultiplePlatformsInSubpackageFiles() throws {
 		stubFileLoader.nameAndDirectoryToFilesMap[StubFileLoader.NameAndDirectory(
 			name: "PackageDescription.swift",
 			directory: "fake",
@@ -143,26 +149,24 @@ final class PackageContentsGeneratorTests: XCTestCase {
 			fromFilesInDirectory: "fake",
 			usingSwiftToolsVersion: "6.0",
 		)
-		XCTAssertEqual(
-			packageFile,
-			"""
-			// swift-tools-version: 6.0
-			// The swift-tools-version declares the minimum version of Swift required to build this package.
+		#expect(packageFile == """
+		// swift-tools-version: 6.0
+		// The swift-tools-version declares the minimum version of Swift required to build this package.
 
-			import PackageDescription
+		import PackageDescription
 
-			let package = Package(
-				name: "TestPackage",
-				platforms: [
-					.iOS(.v13),
-					.macOS(.v13),
-				]
-			)
-			""",
+		let package = Package(
+			name: "TestPackage",
+			platforms: [
+				.iOS(.v13),
+				.macOS(.v13),
+			]
 		)
+		""")
 	}
 
-	func test_generatePackageContents_throwsErrorWhenSingleValueParameterFoundInMultipleFiles() throws {
+	@Test
+	func generatePackageContents_throwsErrorWhenSingleValueParameterFoundInMultipleFiles() throws {
 		stubFileLoader.nameAndDirectoryToFilesMap[StubFileLoader.NameAndDirectory(
 			name: "PackageDescription.swift",
 			directory: "fake",
@@ -175,17 +179,16 @@ final class PackageContentsGeneratorTests: XCTestCase {
 			""",
 		]
 
-		XCTAssertThrowsError(
+		#expect(throws: TooManyArgumentDefinitionsError(label: .name), performing: {
 			try systemUnderTest.generatePackageContents(
 				fromFilesInDirectory: "fake",
 				usingSwiftToolsVersion: "6.0",
-			),
-		) { error in
-			XCTAssertEqual(error as? TooManyArgumentDefinitionsError, TooManyArgumentDefinitionsError(label: .name))
-		}
+			)
+		})
 	}
 
-	func test_generatePackageContents_deduplicatesDependenciesInSubpackageFiles() throws {
+	@Test
+	func generatePackageContents_deduplicatesDependenciesInSubpackageFiles() throws {
 		stubFileLoader.nameAndDirectoryToFilesMap[StubFileLoader.NameAndDirectory(
 			name: "PackageDescription.swift",
 			directory: "fake",
@@ -205,24 +208,22 @@ final class PackageContentsGeneratorTests: XCTestCase {
 			fromFilesInDirectory: "fake",
 			usingSwiftToolsVersion: "6.0",
 		)
-		XCTAssertEqual(
-			packageFile,
-			"""
-			// swift-tools-version: 6.0
-			// The swift-tools-version declares the minimum version of Swift required to build this package.
+		#expect(packageFile == """
+		// swift-tools-version: 6.0
+		// The swift-tools-version declares the minimum version of Swift required to build this package.
 
-			import PackageDescription
+		import PackageDescription
 
-			let package = Package(
-				dependencies: [
-					.package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0")
-				]
-			)
-			""",
+		let package = Package(
+			dependencies: [
+				.package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0")
+			]
 		)
+		""")
 	}
 
-	func test_generatePackageContents_appendsPackageMethodsFiles() throws {
+	@Test
+	func generatePackageContents_appendsPackageMethodsFiles() throws {
 		stubFileLoader.nameAndDirectoryToFilesMap[StubFileLoader.NameAndDirectory(
 			name: "Subpackage.swift",
 			directory: "fake",
@@ -235,25 +236,22 @@ final class PackageContentsGeneratorTests: XCTestCase {
 			fromFilesInDirectory: "fake",
 			usingSwiftToolsVersion: "6.0",
 		)
-		XCTAssertEqual(
-			packageFile,
-			"""
-			// swift-tools-version: 6.0
-			// The swift-tools-version declares the minimum version of Swift required to build this package.
+		#expect(packageFile == """
+		// swift-tools-version: 6.0
+		// The swift-tools-version declares the minimum version of Swift required to build this package.
 
-			import PackageDescription
+		import PackageDescription
 
-			// File 1
+		// File 1
 
-			// File 2
+		// File 2
 
-			// File 3
+		// File 3
 
-			let package = Package(
+		let package = Package(
 
-				)
-			""",
-		)
+			)
+		""")
 	}
 
 	// MARK: Private
