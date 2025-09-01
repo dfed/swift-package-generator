@@ -21,6 +21,7 @@
 import ArgumentParser
 import Foundation
 import PackageGenerator
+import SwiftFormat
 
 struct GenerateCommand: ParsableCommand {
 	init() {}
@@ -34,16 +35,34 @@ struct GenerateCommand: ParsableCommand {
 
 	@Option(help: "The swift-tools-version to use in the generated Package.swift file") var swiftToolsVersion: String = "6.0"
 
+	@Option(help: "Leading whitespace in the generated Package.swift file") var indentation: IndentationType = .tabs
+
+	@Option(help: "The number of `indentation` characters per indentation") var indentationCount: Int = 1
+
+	enum IndentationType: String, ExpressibleByArgument {
+		case tabs
+		case spaces
+
+		func asIndent(count: Int) -> Indent {
+			switch self {
+			case .tabs:
+				.tabs(count)
+			case .spaces:
+				.spaces(count)
+			}
+		}
+	}
+
 	func run() throws {
-		try PackageContentsGenerator()
-			.generatePackageContents(
-				fromFilesInDirectory: rootDirectory,
-				usingSwiftToolsVersion: swiftToolsVersion,
-			)
-			.write(
-				to: URL(filePath: rootDirectory).appending(component: "Package.swift"),
-				atomically: true,
-				encoding: .utf8,
-			)
+		try PackageContentsGenerator(
+			indent: indentation.asIndent(count: indentationCount),
+		).generatePackageContents(
+			fromFilesInDirectory: rootDirectory,
+			usingSwiftToolsVersion: swiftToolsVersion,
+		).write(
+			to: URL(filePath: rootDirectory).appending(component: "Package.swift"),
+			atomically: true,
+			encoding: .utf8,
+		)
 	}
 }

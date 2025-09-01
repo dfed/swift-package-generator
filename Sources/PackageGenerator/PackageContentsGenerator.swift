@@ -18,18 +18,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import SwiftFormat
+
 /// Generates a `Package.swift` file from `Subpackage.swift` and `PackageDescription.swift`.
 public final class PackageContentsGenerator {
 	// MARK: Initialization
 
-	public convenience init() {
+	public convenience init(indent: Indent = .tabs(1)) {
 		self.init(
 			fileLoader: FileLoader(),
+			indent: indent,
 		)
 	}
 
-	required init(fileLoader: FileLoader = FileLoader()) {
+	required init(
+		fileLoader: FileLoader = FileLoader(),
+		indent: Indent = .tabs(1),
+	) {
 		self.fileLoader = fileLoader
+		self.indent = indent
 	}
 
 	// MARK: Public
@@ -38,7 +45,10 @@ public final class PackageContentsGenerator {
 		fromFilesInDirectory directory: String,
 		usingSwiftToolsVersion swiftToolsVersion: String,
 	) throws -> String {
-		let packageDefinitionResolver = PackageDefinitionResolver(fileLoader: fileLoader)
+		let packageDefinitionResolver = PackageDefinitionResolver(
+			fileLoader: fileLoader,
+			indent: indent,
+		)
 
 		let packageDefinition = try packageDefinitionResolver.resolvePackageFromDescriptionFiles(inDirectory: directory)
 
@@ -66,4 +76,5 @@ public final class PackageContentsGenerator {
 	// MARK: Private
 
 	private let fileLoader: FileLoader
+	private let indent: Indent
 }

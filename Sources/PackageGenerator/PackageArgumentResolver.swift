@@ -25,8 +25,12 @@ import SwiftSyntax
 final class PackageDefinitionResolver {
 	// MARK: Initialization
 
-	init(fileLoader: FileLoader = FileLoader()) {
+	init(
+		fileLoader: FileLoader = FileLoader(),
+		indent: Indent = .tabs(1),
+	) {
 		self.fileLoader = fileLoader
+		self.indent = indent
 	}
 
 	// MARK: PackageDefinitionResolver
@@ -87,6 +91,7 @@ final class PackageDefinitionResolver {
 	// MARK: Private
 
 	private let fileLoader: FileLoader
+	private let indent: Indent
 
 	// MARK: - TextStreamReceiver
 
