@@ -32,7 +32,7 @@ struct GenerateCommand: ParsableCommand {
 
 	@Option(help: "The root directory in which to search for Subpackage.swift and PackageDescription.swift and files") var rootDirectory: String = FileManager.default.currentDirectoryPath
 
-	@Option(help: "The swift-tools-version to use in the generated Package.swift file") var swiftToolsVersion: String = "5.8"
+	@Option(help: "The swift-tools-version to use in the generated Package.swift file") var swiftToolsVersion: String = "6.0"
 
 	func run() throws {
 		try PackageContentsGenerator()
