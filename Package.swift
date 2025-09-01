@@ -26,6 +26,9 @@ let package = Package(
 			dependencies: [
 				"PackageGenerator",
 			],
+			swiftSettings: [
+				.swiftLanguageMode(.v6),
+			],
 		),
 		.target(
 			name: "PackageGenerator",
@@ -39,6 +42,9 @@ let package = Package(
 		.testTarget(
 			name: "PackageGeneratorTests",
 			dependencies: ["PackageGenerator"],
+			swiftSettings: [
+				.swiftLanguageMode(.v6),
+			],
 		),
 	],
 )
