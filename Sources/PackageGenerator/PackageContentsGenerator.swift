@@ -24,11 +24,11 @@ public final class PackageContentsGenerator {
 
 	public convenience init() {
 		self.init(
-			fileLoader: DefaultFileLoader(),
+			fileLoader: FileLoader(),
 		)
 	}
 
-	required init(fileLoader: FileLoader) {
+	required init(fileLoader: FileLoader = FileLoader()) {
 		self.fileLoader = fileLoader
 	}
 

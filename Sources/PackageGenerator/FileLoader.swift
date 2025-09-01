@@ -21,22 +21,17 @@
 import Foundation
 
 /// A type that can load the contents of files on disk into memory.
-protocol FileLoader {
-	/// - Parameters:
-	///   - name: The name of the files to find.
-	///   - directory: The root directory within which to look.
-	/// - Returns: The contents of the files matching the name.
-	func loadAllFiles(named name: String, inDirectory directory: String) throws -> [String]
-}
-
-/// The default implementation of `FileLoader`.
-final class DefaultFileLoader: FileLoader {
+final class FileLoader {
 	// MARK: Initialization
 
 	init() {}
 
 	// MARK: FileLoader
 
+	/// - Parameters:
+	///   - name: The name of the files to find.
+	///   - directory: The root directory within which to look.
+	/// - Returns: The contents of the files matching the name.
 	func loadAllFiles(named name: String, inDirectory directory: String) throws -> [String] {
 		if let enumerator = FileManager.default.enumerator(
 			at: URL(filePath: directory),
