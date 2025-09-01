@@ -3,7 +3,7 @@ import Testing
 
 @testable import PackageGenerator
 
-struct PackageContentsGeneratorTests: ~Copyable {
+final class PackageContentsGeneratorTests {
 	// MARK: Initialization
 
 	deinit {
@@ -180,8 +180,8 @@ struct PackageContentsGeneratorTests: ~Copyable {
 		)
 
 		#expect(throws: TooManyArgumentDefinitionsError(label: .name), performing: {
-			try systemUnderTest.generatePackageContents(
-				fromFilesInDirectory: temporaryDirectory.path(),
+			try self.systemUnderTest.generatePackageContents(
+				fromFilesInDirectory: self.temporaryDirectory.path(),
 				usingSwiftToolsVersion: "6.0",
 			)
 		})
@@ -259,16 +259,18 @@ struct PackageContentsGeneratorTests: ~Copyable {
 	private let systemUnderTest = PackageContentsGenerator()
 	private let temporaryDirectory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
 
+	var subdirectoryIndex: UInt64 = 0
 	private func writeFiles(named: String, content: [String]) throws {
 		try FileManager.default.createDirectory(at: temporaryDirectory, withIntermediateDirectories: true)
 		for fileContent in content {
-			let subdirectory = temporaryDirectory.appending(path: UUID().uuidString)
+			let subdirectory = temporaryDirectory.appending(path: subdirectoryIndex.description)
 			try FileManager.default.createDirectory(at: subdirectory, withIntermediateDirectories: true)
 			try fileContent.write(
 				to: subdirectory.appending(path: named),
 				atomically: true,
 				encoding: .utf8,
 			)
+			subdirectoryIndex += 1
 		}
 	}
 }
