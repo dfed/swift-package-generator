@@ -58,14 +58,10 @@ enum PackageParameter: String, CaseIterable {
 		case .defaultLocalization,
 		     .name,
 		     .pkgConfig:
-			if values.count > 1 {
-				throw TooManyArgumentDefinitionsError(label: self)
-
-			} else if let value = values.first {
+			if let value = values.first, values.count == 1 {
 				return "\(rawValue): \(value)"
-
 			} else {
-				throw TooFewArgumentDefinitionsError(label: self)
+				throw TooManyArgumentDefinitionsError(label: self)
 			}
 		}
 	}
