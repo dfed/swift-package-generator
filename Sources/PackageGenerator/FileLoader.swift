@@ -43,7 +43,7 @@ final class DefaultFileLoader: FileLoader {
 			"""
 			find \(directory) -type f -name "\(name)"
 			""",
-			within: .pwd
+			within: .pwd,
 		)
 		.split(separator: "\n")
 		.map { try String(contentsOfFile: String($0)) }

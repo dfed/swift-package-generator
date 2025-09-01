@@ -24,7 +24,7 @@ public final class PackageContentsGenerator {
 
 	public convenience init() {
 		self.init(
-			fileLoader: DefaultFileLoader()
+			fileLoader: DefaultFileLoader(),
 		)
 	}
 
@@ -36,7 +36,7 @@ public final class PackageContentsGenerator {
 
 	public func generatePackageContents(
 		fromFilesInDirectory directory: String,
-		usingSwiftToolsVersion swiftToolsVersion: String
+		usingSwiftToolsVersion swiftToolsVersion: String,
 	) throws -> String {
 		let packageDefinitionResolver = PackageDefinitionResolver(fileLoader: fileLoader)
 
@@ -45,7 +45,7 @@ public final class PackageContentsGenerator {
 		let subpackages = try fileLoader
 			.loadAllFiles(
 				named: "Subpackage.swift",
-				inDirectory: directory
+				inDirectory: directory,
 			)
 		let allSubpackages = if subpackages.isEmpty {
 			""

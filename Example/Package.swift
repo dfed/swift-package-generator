@@ -17,7 +17,7 @@ let package = Package(
 				targets: [
 					"FooFeature",
 					"BarLibrary",
-				]
+				],
 			),
 		],
 	]),
@@ -26,13 +26,13 @@ let package = Package(
 			name: "Foo",
 			dependencies: [
 				"BarLibrary",
-			]
+			],
 		),
 		Target.library(
 			name: "Bar",
-			dependencies: []
+			dependencies: [],
 		),
-	])
+	]),
 )
 
 extension Array {
@@ -45,38 +45,38 @@ extension Target {
 	static func feature(
 		name: String,
 		dependencies: [Target.Dependency],
-		testDependencies: [Target.Dependency] = []
+		testDependencies: [Target.Dependency] = [],
 	)
 		-> [Target]
 	{
 		TargetKind(
 			path: "features",
 			suffix: "Feature",
-			visibility: .targetType(suffixes: ["Feature"])
+			visibility: .targetType(suffixes: ["Feature"]),
 		)
 		.firstPartyTarget(
 			named: name,
 			dependencies: dependencies,
-			testDependencies: testDependencies
+			testDependencies: testDependencies,
 		)
 	}
 
 	static func library(
 		name: String,
 		dependencies: [Target.Dependency],
-		testDependencies: [Target.Dependency] = []
+		testDependencies: [Target.Dependency] = [],
 	)
 		-> [Target]
 	{
 		TargetKind(
 			path: "libraries",
 			suffix: "Library",
-			visibility: .targetType(suffixes: ["Feature", "Library"])
+			visibility: .targetType(suffixes: ["Feature", "Library"]),
 		)
 		.firstPartyTarget(
 			named: name,
 			dependencies: dependencies,
-			testDependencies: testDependencies
+			testDependencies: testDependencies,
 		)
 	}
 }
@@ -131,7 +131,7 @@ struct TargetKind {
 	func firstPartyTarget(
 		named name: String,
 		dependencies: [Target.Dependency],
-		testDependencies: [Target.Dependency]
+		testDependencies: [Target.Dependency],
 	)
 		-> [Target]
 	{
@@ -139,7 +139,7 @@ struct TargetKind {
 			name: name,
 			kind: self,
 			dependencies: dependencies,
-			testDependencies: testDependencies
+			testDependencies: testDependencies,
 		)
 		let targetName = target.targetName
 		VisibilityValidator.validateDependencies(from: target)
@@ -147,12 +147,12 @@ struct TargetKind {
 			.target(
 				name: targetName,
 				dependencies: dependencies,
-				path: target.sourcesPath
+				path: target.sourcesPath,
 			),
 			.testTarget(
 				name: targetName + "Tests",
 				dependencies: dependencies + testDependencies,
-				path: target.testsPath
+				path: target.testsPath,
 			),
 		]
 	}

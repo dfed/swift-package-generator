@@ -32,9 +32,9 @@ final class StubFileLoader: FileLoader {
 		nameAndDirectoryToFilesMap[
 			NameAndDirectory(
 				name: name,
-				directory: directory
+				directory: directory,
 			),
-			default: []
+			default: [],
 		]
 	}
 }

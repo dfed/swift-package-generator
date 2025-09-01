@@ -8,6 +8,6 @@ let products = [
 		targets: [
 			"FooFeature",
 			"BarLibrary",
-		]
+		],
 	),
 ]

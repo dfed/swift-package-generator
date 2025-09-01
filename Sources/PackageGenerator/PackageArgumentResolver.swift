@@ -38,7 +38,7 @@ final class PackageDefinitionResolver {
 		let packageParameterToParametersMap = try fileLoader
 			.loadAllFiles(
 				named: "PackageDescription.swift",
-				inDirectory: directory
+				inDirectory: directory,
 			)
 			.reduce(into: [PackageParameter: Set<String>]()) { partialResult, packageDescription in
 				let syntax = Parser.parse(source: packageDescription)
@@ -62,11 +62,11 @@ final class PackageDefinitionResolver {
 
 		// Format the Package declaration so it looks nice.
 		let parsedPackageDeclaration = Parser.parse(
-			source: unformattedPackageDeclaration
+			source: unformattedPackageDeclaration,
 		)
 		let packageFileSyntax = SourceFileSyntax(
 			statements: parsedPackageDeclaration.statements,
-			endOfFileToken: parsedPackageDeclaration.endOfFileToken
+			endOfFileToken: parsedPackageDeclaration.endOfFileToken,
 		)
 		var packageFileStream = TextStreamReceiver()
 		var configuration = Configuration()

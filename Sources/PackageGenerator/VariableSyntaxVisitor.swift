@@ -30,7 +30,7 @@ final class VariableSyntaxVisitor: SyntaxVisitor {
 					let patternVisitor = PatternSyntaxVisitor(viewMode: .sourceAccurate)
 					patternVisitor.walk($0)
 					return patternVisitor.packageProperty
-				}
+				},
 		)
 
 		return .skipChildren
@@ -60,7 +60,7 @@ final class VariableSyntaxVisitor: SyntaxVisitor {
 			guard let label, let assignedValues else { return nil }
 			return PackageArgument(
 				label: label,
-				values: assignedValues
+				values: assignedValues,
 			)
 		}
 

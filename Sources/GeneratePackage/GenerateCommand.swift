@@ -27,7 +27,7 @@ struct GenerateCommand: ParsableCommand {
 
 	static let configuration = CommandConfiguration(
 		commandName: "swift-generate-package",
-		abstract: "A command line tool to help generate Package.swift files."
+		abstract: "A command line tool to help generate Package.swift files.",
 	)
 
 	@Option(help: "The root directory in which to search for Subpackage.swift and PackageDescription.swift and files") var rootDirectory: String = FileManager.default.currentDirectoryPath
@@ -38,12 +38,12 @@ struct GenerateCommand: ParsableCommand {
 		try PackageContentsGenerator()
 			.generatePackageContents(
 				fromFilesInDirectory: rootDirectory,
-				usingSwiftToolsVersion: swiftToolsVersion
+				usingSwiftToolsVersion: swiftToolsVersion,
 			)
 			.write(
 				to: URL(filePath: rootDirectory).appending(component: "Package.swift"),
 				atomically: true,
-				encoding: .utf8
+				encoding: .utf8,
 			)
 	}
 }

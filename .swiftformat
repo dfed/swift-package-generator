@@ -8,6 +8,7 @@
 --storedvarattrs same-line
 --hexgrouping none
 --decimalgrouping 3
+--trailing-commas always
 
 # rules
 --enable isEmpty
@@ -17,4 +18,4 @@
 --disable blankLineAfterSwitchCase
 
 # global
---swiftversion 6.0
+--swiftversion 6.1

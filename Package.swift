@@ -11,7 +11,7 @@ let package = Package(
 	products: [
 		.executable(
 			name: "swift-generate-package",
-			targets: ["GeneratePackage"]
+			targets: ["GeneratePackage"],
 		),
 	],
 	dependencies: [
@@ -25,7 +25,7 @@ let package = Package(
 			name: "GeneratePackage",
 			dependencies: [
 				"PackageGenerator",
-			]
+			],
 		),
 		.target(
 			name: "PackageGenerator",
@@ -34,11 +34,11 @@ let package = Package(
 				.product(name: "SwiftFormat", package: "swift-format"),
 				.product(name: "SwiftParser", package: "swift-syntax"),
 				.product(name: "SwiftShell", package: "swift-shell"),
-			]
+			],
 		),
 		.testTarget(
 			name: "PackageGeneratorTests",
-			dependencies: ["PackageGenerator"]
+			dependencies: ["PackageGenerator"],
 		),
-	]
+	],
 )
