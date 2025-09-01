@@ -38,9 +38,18 @@ final class DefaultFileLoader: FileLoader {
 	// MARK: FileLoader
 
 	func loadAllFiles(named name: String, inDirectory directory: String) throws -> [String] {
-		try FileManager.default.contentsOfDirectory(atPath: directory).filter {
-			URL(filePath: $0).lastPathComponent == name
+		if let enumerator = FileManager.default.enumerator(
+			at: URL(filePath: directory),
+			includingPropertiesForKeys: nil,
+		) {
+			var files: [String] = []
+			for case let fileURL as URL in enumerator where fileURL.lastPathComponent == name {
+				files.append(try String(contentsOf: fileURL))
+			}
+			return files
+		} else {
+			struct CouldNotEnumerateDirectory: Error {}
+			throw CouldNotEnumerateDirectory()
 		}
-		.map { try String(contentsOfFile: String($0)) }
 	}
 }

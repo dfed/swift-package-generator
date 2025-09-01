@@ -54,6 +54,19 @@ jobs:
         with:
           fail_ci_if_error: true
           verbose: true
+  example:
+    name: "Validate example"
+    runs-on: ubuntu-24.04
+    container: swift:6.1
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v5
+      - name: Generate Example Package
+        run: swift run swift-generate-package --root-directory Example/
+      - name: Build Example
+        run: swift test --package-path Example/
   readme-validation:
     name: Check Markdown links
     runs-on: ubuntu-latest
