@@ -42,6 +42,6 @@ final class FileLoader {
 				try files.append(String(contentsOf: fileURL))
 			}
 		}
-		return files
+		return files.sorted()
 	}
 }
