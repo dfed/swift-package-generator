@@ -25,7 +25,7 @@ import PackageGenerator
 struct GenerateCommand: ParsableCommand {
 	init() {}
 
-	static var configuration = CommandConfiguration(
+	static let configuration = CommandConfiguration(
 		commandName: "swift-generate-package",
 		abstract: "A command line tool to help generate Package.swift files."
 	)

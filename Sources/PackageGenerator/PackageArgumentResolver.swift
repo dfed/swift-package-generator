@@ -19,7 +19,6 @@
 // SOFTWARE.
 
 import SwiftFormat
-import SwiftFormatConfiguration
 import SwiftParser
 import SwiftSyntax
 
@@ -71,13 +70,15 @@ final class PackageDefinitionResolver {
 		)
 		var packageFileStream = TextStreamReceiver()
 		var configuration = Configuration()
-		configuration.indentation = .spaces(4)
+		configuration.indentation = .tabs(1)
 		try SwiftFormatter(configuration: configuration)
 			.format(
 				syntax: packageFileSyntax,
+				source: unformattedPackageDeclaration,
 				operatorTable: .standardOperators,
 				assumingFileURL: nil,
-				to: &packageFileStream
+				selection: .infinite,
+				to: &packageFileStream,
 			)
 
 		return packageFileStream.text.trimmingCharacters(in: .whitespacesAndNewlines)

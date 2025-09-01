@@ -15,10 +15,10 @@ final class PackageContentsGeneratorTests: XCTestCase {
 	func test_generatePackageContents_includesInputSwiftToolsVersion() throws {
 		let packageFile = try systemUnderTest.generatePackageContents(
 			fromFilesInDirectory: "fake",
-			usingSwiftToolsVersion: "5.8"
+			usingSwiftToolsVersion: "6.0"
 		)
 		let swiftToolsVersionLine = try XCTUnwrap(packageFile.split(separator: "\n").first)
-		XCTAssertEqual(swiftToolsVersionLine, "// swift-tools-version: 5.8")
+		XCTAssertEqual(swiftToolsVersionLine, "// swift-tools-version: 6.0")
 	}
 
 	func test_generatePackageContents_utilizesArgumentsFromSubpackageFiles() throws {
@@ -31,39 +31,39 @@ final class PackageContentsGeneratorTests: XCTestCase {
 			""",
 			"""
 			let platforms = [
-			    .macOS(.v13)
+				.macOS(.v13)
 			]
 			""",
 			"""
 			let products = [
-			    .library(
-			        name: "Library"
-			    ),
+				.library(
+					name: "Library"
+				),
 			]
 			""",
 		]
 		let packageFile = try systemUnderTest.generatePackageContents(
 			fromFilesInDirectory: "fake",
-			usingSwiftToolsVersion: "5.8"
+			usingSwiftToolsVersion: "6.0"
 		)
 		XCTAssertEqual(
 			packageFile,
 			"""
-			// swift-tools-version: 5.8
+			// swift-tools-version: 6.0
 			// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 			import PackageDescription
 
 			let package = Package(
-			    name: "TestPackage",
-			    platforms: [
-			        .macOS(.v13)
-			    ],
-			    products: [
-			        .library(
-			            name: "Library"
-			        )
-			    ]
+				name: "TestPackage",
+				platforms: [
+					.macOS(.v13)
+				],
+				products: [
+					.library(
+						name: "Library"
+					)
+				]
 			)
 			"""
 		)
@@ -80,14 +80,14 @@ final class PackageContentsGeneratorTests: XCTestCase {
 			""",
 			"""
 			let platforms = [
-			    .macOS(.v13) // We support macOS 13!
+				.macOS(.v13) // We support macOS 13!
 			]
 			""",
 			"""
 			let products = [
-			    .library(
-			        name: "Library"
-			    ),
+				.library(
+					name: "Library"
+				),
 			]
 
 			// extra whitespace above
@@ -95,26 +95,26 @@ final class PackageContentsGeneratorTests: XCTestCase {
 		]
 		let packageFile = try systemUnderTest.generatePackageContents(
 			fromFilesInDirectory: "fake",
-			usingSwiftToolsVersion: "5.8"
+			usingSwiftToolsVersion: "6.0"
 		)
 		XCTAssertEqual(
 			packageFile,
 			"""
-			// swift-tools-version: 5.8
+			// swift-tools-version: 6.0
 			// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 			import PackageDescription
 
 			let package = Package(
-			    name: "TestPackage",
-			    platforms: [
-			        .macOS(.v13)
-			    ],
-			    products: [
-			        .library(
-			            name: "Library"
-			        )
-			    ]
+				name: "TestPackage",
+				platforms: [
+					.macOS(.v13)
+				],
+				products: [
+					.library(
+						name: "Library"
+					)
+				]
 			)
 			"""
 		)
@@ -130,33 +130,33 @@ final class PackageContentsGeneratorTests: XCTestCase {
 			""",
 			"""
 			let platforms = [
-			    .macOS(.v13)
+				.macOS(.v13)
 			]
 			""",
 			"""
 			let platforms = [
-			    .iOS(.v13)
+				.iOS(.v13)
 			]
 			""",
 		]
 		let packageFile = try systemUnderTest.generatePackageContents(
 			fromFilesInDirectory: "fake",
-			usingSwiftToolsVersion: "5.8"
+			usingSwiftToolsVersion: "6.0"
 		)
 		XCTAssertEqual(
 			packageFile,
 			"""
-			// swift-tools-version: 5.8
+			// swift-tools-version: 6.0
 			// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 			import PackageDescription
 
 			let package = Package(
-			    name: "TestPackage",
-			    platforms: [
-			        .iOS(.v13),
-			        .macOS(.v13),
-			    ]
+				name: "TestPackage",
+				platforms: [
+					.iOS(.v13),
+					.macOS(.v13),
+				]
 			)
 			"""
 		)
@@ -178,7 +178,7 @@ final class PackageContentsGeneratorTests: XCTestCase {
 		XCTAssertThrowsError(
 			try systemUnderTest.generatePackageContents(
 				fromFilesInDirectory: "fake",
-				usingSwiftToolsVersion: "5.8"
+				usingSwiftToolsVersion: "6.0"
 			)
 		) { error in
 			XCTAssertEqual(error as? TooManyArgumentDefinitionsError, TooManyArgumentDefinitionsError(label: .name))
@@ -192,31 +192,31 @@ final class PackageContentsGeneratorTests: XCTestCase {
 		)] = [
 			"""
 			let dependencies = [
-			    .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0")
+				.package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0")
 			]
 			""",
 			"""
 			let dependencies = [
-			    .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0")
+				.package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0")
 			]
 			""",
 		]
 		let packageFile = try systemUnderTest.generatePackageContents(
 			fromFilesInDirectory: "fake",
-			usingSwiftToolsVersion: "5.8"
+			usingSwiftToolsVersion: "6.0"
 		)
 		XCTAssertEqual(
 			packageFile,
 			"""
-			// swift-tools-version: 5.8
+			// swift-tools-version: 6.0
 			// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 			import PackageDescription
 
 			let package = Package(
-			    dependencies: [
-			        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0")
-			    ]
+				dependencies: [
+					.package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0")
+				]
 			)
 			"""
 		)
@@ -233,19 +233,19 @@ final class PackageContentsGeneratorTests: XCTestCase {
 		]
 		let packageFile = try systemUnderTest.generatePackageContents(
 			fromFilesInDirectory: "fake",
-			usingSwiftToolsVersion: "5.8"
+			usingSwiftToolsVersion: "6.0"
 		)
 		XCTAssertEqual(
 			packageFile,
 			"""
-			// swift-tools-version: 5.8
+			// swift-tools-version: 6.0
 			// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 			import PackageDescription
 
 			let package = Package(
 
-			    )
+				)
 
 			// File 1
 
