@@ -20,6 +20,6 @@
 
 /// A representation of the argument label and value in a `Package(...)` initializer.
 struct PackageArgument {
-    let label: PackageParameter
-    let values: [String]
+	let label: PackageParameter
+	let values: [String]
 }

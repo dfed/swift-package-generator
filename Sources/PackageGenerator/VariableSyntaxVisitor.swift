@@ -22,60 +22,60 @@ import SwiftSyntax
 
 /// A syntax visitor that undertsands variable declarations.
 final class VariableSyntaxVisitor: SyntaxVisitor {
+	override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
+		packageProperties.append(
+			contentsOf: node
+				.bindings
+				.compactMap {
+					let patternVisitor = PatternSyntaxVisitor(viewMode: .sourceAccurate)
+					patternVisitor.walk($0)
+					return patternVisitor.packageProperty
+				}
+		)
 
-    override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
-        packageProperties.append(
-            contentsOf: node
-                .bindings
-                .compactMap {
-                    let patternVisitor = PatternSyntaxVisitor(viewMode: .sourceAccurate)
-                    patternVisitor.walk($0)
-                    return patternVisitor.packageProperty
-                }
-        )
+		return .skipChildren
+	}
 
-        return .skipChildren
-    }
+	private(set) var packageProperties: [PackageArgument] = []
 
-    private(set) var packageProperties: [PackageArgument] = []
+	private final class PatternSyntaxVisitor: SyntaxVisitor {
+		override func visit(_ node: IdentifierPatternSyntax) -> SyntaxVisitorContinueKind {
+			label = PackageParameter(rawValue: node.identifier.text)
+			return .skipChildren
+		}
 
-    private final class PatternSyntaxVisitor: SyntaxVisitor {
-        override func visit(_ node: IdentifierPatternSyntax) -> SyntaxVisitorContinueKind {
-            label = PackageParameter(rawValue: node.identifier.text)
-            return .skipChildren
-        }
+		override func visit(_ node: InitializerClauseSyntax) -> SyntaxVisitorContinueKind {
+			if let arraySyntax = ArrayExprSyntax(node.value) {
+				let arrayVisitor = ArraySyntaxVisitor(viewMode: .sourceAccurate)
+				arrayVisitor.walk(arraySyntax)
+				assignedValues = arrayVisitor.assignedValues
 
-        override func visit(_ node: InitializerClauseSyntax) -> SyntaxVisitorContinueKind {
-            if let arraySyntax = ArrayExprSyntax(node.value) {
-                let arrayVisitor = ArraySyntaxVisitor(viewMode: .sourceAccurate)
-                arrayVisitor.walk(arraySyntax)
-                assignedValues = arrayVisitor.assignedValues
+			} else {
+				assignedValues = [node.value.description]
+			}
+			return .skipChildren
+		}
 
-            } else {
-                assignedValues = [node.value.description]
-            }
-            return .skipChildren
-        }
+		var packageProperty: PackageArgument? {
+			guard let label, let assignedValues else { return nil }
+			return PackageArgument(
+				label: label,
+				values: assignedValues
+			)
+		}
 
-        var packageProperty: PackageArgument? {
-            guard let label, let assignedValues else { return nil }
-            return PackageArgument(
-                label: label,
-                values: assignedValues)
-        }
+		// MARK: Private
 
-        // MARK: Private
+		private var label: PackageParameter?
+		private var assignedValues: [String]?
 
-        private var label: PackageParameter?
-        private var assignedValues: [String]?
+		private final class ArraySyntaxVisitor: SyntaxVisitor {
+			override func visit(_ node: ArrayExprSyntax) -> SyntaxVisitorContinueKind {
+				assignedValues = node.elements.map(\.trimmedDescription)
+				return .skipChildren
+			}
 
-        private final class ArraySyntaxVisitor: SyntaxVisitor {
-            override func visit(_ node: ArrayExprSyntax) -> SyntaxVisitorContinueKind {
-                assignedValues = node.elements.map(\.trimmedDescription)
-                return .skipChildren
-            }
-
-            var assignedValues: [String]?
-        }
-    }
+			var assignedValues: [String]?
+		}
+	}
 }

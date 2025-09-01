@@ -20,52 +20,50 @@
 
 /// Generates a `Package.swift` file from `Subpackage.swift` and `PackageDescription.swift`.
 public final class PackageContentsGenerator {
+	// MARK: Initialization
 
-    // MARK: Initialization
+	public convenience init() {
+		self.init(
+			fileLoader: DefaultFileLoader()
+		)
+	}
 
-    public convenience init() {
-        self.init(
-            fileLoader: DefaultFileLoader()
-        )
-    }
+	required init(fileLoader: FileLoader) {
+		self.fileLoader = fileLoader
+	}
 
-    required init(fileLoader: FileLoader) {
-        self.fileLoader = fileLoader
-    }
+	// MARK: Public
 
-    // MARK: Public
+	public func generatePackageContents(
+		fromFilesInDirectory directory: String,
+		usingSwiftToolsVersion swiftToolsVersion: String
+	) throws -> String {
+		let packageDefinitionResolver = PackageDefinitionResolver(fileLoader: fileLoader)
 
-    public func generatePackageContents(
-        fromFilesInDirectory directory: String,
-        usingSwiftToolsVersion swiftToolsVersion: String
-    ) throws -> String {
-        let packageDefinitionResolver = PackageDefinitionResolver(fileLoader: fileLoader)
+		let packageDefinition = try packageDefinitionResolver.resolvePackageFromDescriptionFiles(inDirectory: directory)
 
-        let packageDefinition = try packageDefinitionResolver.resolvePackageFromDescriptionFiles(inDirectory: directory)
+		let subpackages = try fileLoader
+			.loadAllFiles(
+				named: "Subpackage.swift",
+				inDirectory: directory
+			)
+		let allSubpackages = if subpackages.isEmpty {
+			""
+		} else {
+			"\n\n\(subpackages.joined(separator: "\n\n"))"
+		}
 
-        let subpackages = try fileLoader
-            .loadAllFiles(
-                named: "Subpackage.swift",
-                inDirectory: directory)
-        let allSubpackages: String
-        if subpackages.isEmpty {
-            allSubpackages = ""
-        } else {
-            allSubpackages = "\n\n\(subpackages.joined(separator: "\n\n"))"
-        }
+		return """
+		// swift-tools-version: \(swiftToolsVersion)
+		// The swift-tools-version declares the minimum version of Swift required to build this package.
 
-        return """
-        // swift-tools-version: \(swiftToolsVersion)
-        // The swift-tools-version declares the minimum version of Swift required to build this package.
+		import PackageDescription
 
-        import PackageDescription
+		\(packageDefinition)
+		""".appending(allSubpackages)
+	}
 
-        \(packageDefinition)
-        """.appending(allSubpackages)
-    }
+	// MARK: Private
 
-    // MARK: Private
-
-    private let fileLoader: FileLoader
-
+	private let fileLoader: FileLoader
 }

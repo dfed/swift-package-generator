@@ -23,29 +23,27 @@ import Foundation
 import PackageGenerator
 
 struct GenerateCommand: ParsableCommand {
-    init() {}
+	init() {}
 
-    static var configuration = CommandConfiguration(
-        commandName: "swift-generate-package",
-        abstract: "A command line tool to help generate Package.swift files.")
+	static var configuration = CommandConfiguration(
+		commandName: "swift-generate-package",
+		abstract: "A command line tool to help generate Package.swift files."
+	)
 
-    @Option(help: "The root directory in which to search for Subpackage.swift and PackageDescription.swift and files")
-    var rootDirectory: String = FileManager.default.currentDirectoryPath
+	@Option(help: "The root directory in which to search for Subpackage.swift and PackageDescription.swift and files") var rootDirectory: String = FileManager.default.currentDirectoryPath
 
-    @Option(help: "The swift-tools-version to use in the generated Package.swift file")
-    var swiftToolsVersion: String = "5.8"
+	@Option(help: "The swift-tools-version to use in the generated Package.swift file") var swiftToolsVersion: String = "5.8"
 
-    func run() throws {
-        try PackageContentsGenerator()
-            .generatePackageContents(
-                fromFilesInDirectory: rootDirectory,
-                usingSwiftToolsVersion: swiftToolsVersion
-            )
-            .write(
-                to: URL(filePath: rootDirectory).appending(component: "Package.swift"),
-                atomically: true,
-                encoding: .utf8
-            )
-    }
+	func run() throws {
+		try PackageContentsGenerator()
+			.generatePackageContents(
+				fromFilesInDirectory: rootDirectory,
+				usingSwiftToolsVersion: swiftToolsVersion
+			)
+			.write(
+				to: URL(filePath: rootDirectory).appending(component: "Package.swift"),
+				atomically: true,
+				encoding: .utf8
+			)
+	}
 }
-

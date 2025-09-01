@@ -1,6 +1,6 @@
 let targets = Target.feature(
-    name: "Foo",
-    dependencies: [
-        "BarLibrary",
-    ]
+	name: "Foo",
+	dependencies: [
+		"BarLibrary",
+	]
 )

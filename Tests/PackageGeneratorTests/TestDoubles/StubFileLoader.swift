@@ -21,19 +21,20 @@
 @testable import PackageGenerator
 
 final class StubFileLoader: FileLoader {
-    struct NameAndDirectory: Hashable {
-        let name: String
-        let directory: String
-    }
+	struct NameAndDirectory: Hashable {
+		let name: String
+		let directory: String
+	}
 
-    var nameAndDirectoryToFilesMap = [NameAndDirectory: [String]]()
+	var nameAndDirectoryToFilesMap = [NameAndDirectory: [String]]()
 
-    func loadAllFiles(named name: String, inDirectory directory: String) throws -> [String] {
-        nameAndDirectoryToFilesMap[
-            NameAndDirectory(
-                name: name,
-                directory: directory),
-            default: []]
-    }
-
+	func loadAllFiles(named name: String, inDirectory directory: String) throws -> [String] {
+		nameAndDirectoryToFilesMap[
+			NameAndDirectory(
+				name: name,
+				directory: directory
+			),
+			default: []
+		]
+	}
 }

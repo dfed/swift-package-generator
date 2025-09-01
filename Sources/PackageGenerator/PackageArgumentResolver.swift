@@ -20,80 +20,80 @@
 
 import SwiftFormat
 import SwiftFormatConfiguration
-import SwiftSyntax
 import SwiftParser
+import SwiftSyntax
 
 final class PackageDefinitionResolver {
+	// MARK: Initialization
 
-    // MARK: Initialization
+	init(fileLoader: FileLoader = DefaultFileLoader()) {
+		self.fileLoader = fileLoader
+	}
 
-    init(fileLoader: FileLoader = DefaultFileLoader()) {
-        self.fileLoader = fileLoader
-    }
+	// MARK: PackageDefinitionResolver
 
-    // MARK: PackageDefinitionResolver
+	/// Creates a `let package = Package(...)` definition from the arguments found in `PackageDescription.swift` files in the given directory..
+	/// - Parameter directory: The directory in which to recursively search for the `PackageDescription.swift` files.
+	/// - Returns: The Package's definition.
+	func resolvePackageFromDescriptionFiles(inDirectory directory: String) throws -> String {
+		let packageParameterToParametersMap = try fileLoader
+			.loadAllFiles(
+				named: "PackageDescription.swift",
+				inDirectory: directory
+			)
+			.reduce(into: [PackageParameter: Set<String>]()) { partialResult, packageDescription in
+				let syntax = Parser.parse(source: packageDescription)
+				let visitor = VariableSyntaxVisitor(viewMode: .sourceAccurate)
+				visitor.walk(syntax)
+				for packageProperty in visitor.packageProperties {
+					partialResult[packageProperty.label, default: []].formUnion(packageProperty.values)
+				}
+			}
+		var packageParameters = [String]()
+		for packageParameter in PackageParameter.allCases {
+			guard let parameters = packageParameterToParametersMap[packageParameter] else { continue }
+			try packageParameters.append(packageParameter.combinedParameter(from: parameters.sorted()))
+		}
 
-    /// Creates a `let package = Package(...)` definition from the arguments found in `PackageDescription.swift` files in the given directory..
-    /// - Parameter directory: The directory in which to recursively search for the `PackageDescription.swift` files.
-    /// - Returns: The Package's definition.
-    func resolvePackageFromDescriptionFiles(inDirectory directory: String) throws -> String {
-        let packageParameterToParametersMap = try fileLoader
-            .loadAllFiles(
-                named: "PackageDescription.swift",
-                inDirectory: directory
-            )
-            .reduce(into: [PackageParameter: Set<String>]()) { partialResult, packageDescription in
-                let syntax = Parser.parse(source: packageDescription)
-                let visitor = VariableSyntaxVisitor(viewMode: .sourceAccurate)
-                visitor.walk(syntax)
-                for packageProperty in visitor.packageProperties {
-                    partialResult[packageProperty.label, default: []].formUnion(packageProperty.values)
-                }
-            }
-        var packageParameters = [String]()
-        for packageParameter in PackageParameter.allCases {
-            guard let parameters = packageParameterToParametersMap[packageParameter] else { continue }
-            try packageParameters.append(packageParameter.combinedParameter(from: parameters.sorted()))
-        }
+		let unformattedPackageDeclaration = """
+		let package = Package(
+		\(packageParameters.joined(separator: ",\n"))
+		)
+		"""
 
-        let unformattedPackageDeclaration = """
-        let package = Package(
-        \(packageParameters.joined(separator: ",\n"))
-        )
-        """
+		// Format the Package declaration so it looks nice.
+		let parsedPackageDeclaration = Parser.parse(
+			source: unformattedPackageDeclaration
+		)
+		let packageFileSyntax = SourceFileSyntax(
+			statements: parsedPackageDeclaration.statements,
+			endOfFileToken: parsedPackageDeclaration.endOfFileToken
+		)
+		var packageFileStream = TextStreamReceiver()
+		var configuration = Configuration()
+		configuration.indentation = .spaces(4)
+		try SwiftFormatter(configuration: configuration)
+			.format(
+				syntax: packageFileSyntax,
+				operatorTable: .standardOperators,
+				assumingFileURL: nil,
+				to: &packageFileStream
+			)
 
-        // Format the Package declaration so it looks nice.
-        let parsedPackageDeclaration = Parser.parse(
-            source: unformattedPackageDeclaration
-        )
-        let packageFileSyntax = SourceFileSyntax(
-            statements: parsedPackageDeclaration.statements,
-            endOfFileToken: parsedPackageDeclaration.endOfFileToken
-        )
-        var packageFileStream = TextStreamReceiver()
-        var configuration = Configuration()
-        configuration.indentation = .spaces(4)
-        try SwiftFormatter(configuration: configuration)
-            .format(
-                syntax: packageFileSyntax,
-                operatorTable: .standardOperators,
-                assumingFileURL: nil,
-                to: &packageFileStream)
+		return packageFileStream.text.trimmingCharacters(in: .whitespacesAndNewlines)
+	}
 
-        return packageFileStream.text.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
+	// MARK: Private
 
-    // MARK: Private
+	private let fileLoader: FileLoader
 
-    private let fileLoader: FileLoader
+	// MARK: - TextStreamReceiver
 
-    // MARK: - TextStreamReceiver
+	private struct TextStreamReceiver: TextOutputStream {
+		var text = ""
 
-    private struct TextStreamReceiver: TextOutputStream {
-        var text = ""
-
-        mutating func write(_ streamedText: String) {
-            text += streamedText
-        }
-    }
+		mutating func write(_ streamedText: String) {
+			text += streamedText
+		}
+	}
 }
