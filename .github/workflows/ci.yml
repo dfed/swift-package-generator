@@ -21,7 +21,7 @@ jobs:
       - name: Select Xcode Version
         run: sudo xcode-select --switch /Applications/Xcode_16.4.app/Contents/Developer
       - name: Build and Test Framework
-        run: xcrun swift test -c release -Xswiftc -enable-testing
+        run: xcrun swift test -c release --enable-code-coverage -Xswiftc -enable-testing
       - name: Prepare Coverage Reports
         run: ./CLI/prepare-coverage-reports.sh
       - name: Upload Coverage Reports
@@ -43,7 +43,7 @@ jobs:
         run: swift test -c release --enable-code-coverage -Xswiftc -enable-testing
       - name: Prepare Coverage Reports
         run: |
-          llvm-cov export -format="lcov" .build/x86_64-unknown-linux-gnu/release/swift-package-generatorPackageTests.xctest -instr-profile .build/x86_64-unknown-linux-gnu/release/codecov/default.profdata > coverage.lcov
+          llvm-cov export -format="lcov" .build/x86_64-unknown-linux-gnu/release/SwiftPackageGeneratorPackageTests.xctest -instr-profile .build/x86_64-unknown-linux-gnu/release/codecov/default.profdata > coverage.lcov
       - name: Install curl for Codecov
         run: |
           apt-get update

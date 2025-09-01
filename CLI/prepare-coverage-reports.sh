@@ -14,7 +14,7 @@ function exportlcov() {
     elif [[ -z $executable ]]; then
         echo "\tAborting creation of $output_file_name – no executable found."
     else
-        output_dir=".build/artifacts/$build_type"
+        output_dir=".build/artifacts/"
         mkdir -p $output_dir
 
         output_file="$output_dir/$output_file_name"
@@ -23,4 +23,4 @@ function exportlcov() {
     fi
 }
 
-exportlcov 'SwiftPackageGeneratorTests'
+exportlcov 'SwiftPackageGeneratorPackageTests'
