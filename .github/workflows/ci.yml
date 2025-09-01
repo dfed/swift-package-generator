@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches:
+    - main
+  schedule:
+    # Runs at 00:00 UTC every Monday to ensure that CI does not bitrot.
+    - cron: '0 0 * * 1'
+  pull_request:
+
+jobs:
+  spm-16-swift:
+    name: Swift Build Xcode 16.4
+    runs-on: macos-15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v5
+      - name: Select Xcode Version
+        run: sudo xcode-select --switch /Applications/Xcode_16.4.app/Contents/Developer
+      - name: Build and Test Framework
+        run: xcrun swift test -c release --enable-code-coverage -Xswiftc -enable-testing
+      - name: Prepare Coverage Reports
+        run: ./CLI/prepare-coverage-reports.sh
+      - name: Upload Coverage Reports
+        if: success()
+        uses: codecov/codecov-action@v5
+        with:
+          fail_ci_if_error: true
+          verbose: true
+  linux-6-1:
+    name: "Build and Test on Linux"
+    runs-on: ubuntu-24.04
+    container: swift:6.1
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v5
+      - name: Build and Test Framework
+        run: swift test -c release --enable-code-coverage -Xswiftc -enable-testing
+      - name: Prepare Coverage Reports
+        run: |
+          llvm-cov export -format="lcov" .build/x86_64-unknown-linux-gnu/release/SwiftPackageGeneratorPackageTests.xctest -instr-profile .build/x86_64-unknown-linux-gnu/release/codecov/default.profdata > coverage.lcov
+      - name: Install curl for Codecov
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends curl ca-certificates
+      - name: Upload Coverage Reports
+        if: success()
+        uses: codecov/codecov-action@v5
+        with:
+          fail_ci_if_error: true
+          verbose: true
+  example:
+    name: "Validate example"
+    runs-on: ubuntu-24.04
+    container: swift:6.1
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v5
+      - name: Generate Example Package
+        run: swift run swift-generate-package --root-directory Example/
+      - name: Build Example
+        run: swift test --package-path Example/
+  readme-validation:
+    name: Check Markdown links
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v5
+      - name: Link Checker
+        uses: AlexanderDokuchaev/md-dead-link-check@d5a37e0b14e5918605d22b34562532762ccb2e47 # v1.2.0
+  lint-swift:
+    name: Lint Swift
+    runs-on: ubuntu-latest
+    container: swift:6.1
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v5
+      - name: Lint Swift
+        run: swift run --package-path CLI swiftformat Sources Tests --lint

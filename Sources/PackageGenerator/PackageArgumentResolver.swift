@@ -25,7 +25,7 @@ import SwiftSyntax
 final class PackageDefinitionResolver {
 	// MARK: Initialization
 
-	init(fileLoader: FileLoader = DefaultFileLoader()) {
+	init(fileLoader: FileLoader = FileLoader()) {
 		self.fileLoader = fileLoader
 	}
 
