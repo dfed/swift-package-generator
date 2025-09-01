@@ -19,7 +19,6 @@
 // SOFTWARE.
 
 import Foundation
-import SwiftShell
 
 /// A type that can load the contents of files on disk into memory.
 protocol FileLoader {
@@ -39,13 +38,9 @@ final class DefaultFileLoader: FileLoader {
 	// MARK: FileLoader
 
 	func loadAllFiles(named name: String, inDirectory directory: String) throws -> [String] {
-		try Process.execute(
-			"""
-			find \(directory) -type f -name "\(name)"
-			""",
-			within: .pwd,
-		)
-		.split(separator: "\n")
+		try FileManager.default.contentsOfDirectory(atPath: directory).filter {
+			URL(filePath: $0).lastPathComponent == name
+		}
 		.map { try String(contentsOfFile: String($0)) }
 	}
 }
