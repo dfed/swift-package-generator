@@ -50,7 +50,7 @@ public final class PackageContentsGenerator {
 		let allSubpackages = if subpackages.isEmpty {
 			""
 		} else {
-			"\n\n\(subpackages.joined(separator: "\n\n"))"
+			"\(subpackages.joined(separator: "\n\n"))\n\n"
 		}
 
 		return """
@@ -59,8 +59,8 @@ public final class PackageContentsGenerator {
 
 		import PackageDescription
 
-		\(packageDefinition)
-		""".appending(allSubpackages)
+		\(allSubpackages)\(packageDefinition)
+		"""
 	}
 
 	// MARK: Private

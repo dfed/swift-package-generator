@@ -1,54 +1,16 @@
-// swift-tools-version: 5.8
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
-let package = Package(
-	name: "Scratch",
-	platforms: .flatten([
-		[
-			.macOS(.v13),
-		],
-	]),
-	products: .flatten([
-		[
-			.library(
-				name: "Scratch",
-				targets: [
-					"FooFeature",
-					"BarLibrary",
-				],
-			),
-		],
-	]),
-	targets: .flatten([
-		Target.feature(
-			name: "Foo",
-			dependencies: [
-				"BarLibrary",
-			],
-		),
-		Target.library(
-			name: "Bar",
-			dependencies: [],
-		),
-	]),
-)
-
-extension Array {
-	static func flatten(_ targets: [[Element]]) -> [Element] {
-		targets.flatMap(\.self)
-	}
-}
+let validator = VisibilityValidator()
 
 extension Target {
 	static func feature(
 		name: String,
 		dependencies: [Target.Dependency],
 		testDependencies: [Target.Dependency] = [],
-	)
-		-> [Target]
-	{
+	) -> [Target] {
 		TargetKind(
 			path: "features",
 			suffix: "Feature",
@@ -65,9 +27,7 @@ extension Target {
 		name: String,
 		dependencies: [Target.Dependency],
 		testDependencies: [Target.Dependency] = [],
-	)
-		-> [Target]
-	{
+	) -> [Target] {
 		TargetKind(
 			path: "libraries",
 			suffix: "Library",
@@ -86,8 +46,8 @@ enum RestrictedVisibility {
 	case targetType(suffixes: [String])
 }
 
-enum VisibilityValidator {
-	static func validateDependencies(from target: FirstPartyTarget) {
+final class VisibilityValidator: @unchecked Sendable {
+	func validateDependencies(from target: FirstPartyTarget) {
 		let targetName = target.targetName
 		allDependencies[targetName] = target.dependencies
 		allRestrictedVisibility[targetName] = target.kind.visibility
@@ -95,10 +55,10 @@ enum VisibilityValidator {
 		validate()
 	}
 
-	private static var allDependencies = [String: [Target.Dependency]]()
-	private static var allRestrictedVisibility = [String: RestrictedVisibility]()
+	private var allDependencies = [String: [Target.Dependency]]()
+	private var allRestrictedVisibility = [String: RestrictedVisibility]()
 
-	private static func validate() {
+	private func validate() {
 		for (target, dependencies) in allDependencies {
 			for dependency in dependencies {
 				guard let restrictedVisibility = allRestrictedVisibility[dependency.name] else {
@@ -132,9 +92,7 @@ struct TargetKind {
 		named name: String,
 		dependencies: [Target.Dependency],
 		testDependencies: [Target.Dependency],
-	)
-		-> [Target]
-	{
+	) -> [Target] {
 		let target = FirstPartyTarget(
 			name: name,
 			kind: self,
@@ -142,7 +100,7 @@ struct TargetKind {
 			testDependencies: testDependencies,
 		)
 		let targetName = target.targetName
-		VisibilityValidator.validateDependencies(from: target)
+		validator.validateDependencies(from: target)
 		return [
 			.target(
 				name: targetName,
@@ -194,3 +152,32 @@ extension String {
 		self + (hasSuffix("/") ? "" : "/")
 	}
 }
+
+
+let package = Package(
+	name: "Scratch",
+	platforms: [
+		.macOS(.v13)
+	],
+	products: [
+		.library(
+			name: "Scratch",
+			targets: [
+				"FooFeature",
+				"BarLibrary",
+			],
+		)
+	],
+	targets: [
+		Target.feature(
+			name: "Foo",
+			dependencies: [
+				"BarLibrary"
+			],
+		),
+		Target.library(
+			name: "Bar",
+			dependencies: [],
+		),
+	]
+)
