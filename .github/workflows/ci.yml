@@ -23,7 +23,7 @@ jobs:
       - name: Build and Test Framework
         run: xcrun swift test -c release -Xswiftc -enable-testing
       - name: Prepare Coverage Reports
-        run: ./Scripts/prepare-coverage-reports.sh
+        run: ./CLI/prepare-coverage-reports.sh
       - name: Upload Coverage Reports
         if: success()
         uses: codecov/codecov-action@v5
