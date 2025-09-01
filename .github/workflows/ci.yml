@@ -18,10 +18,6 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v5
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3.5'
-          bundler-cache: true
       - name: Select Xcode Version
         run: sudo xcode-select --switch /Applications/Xcode_16.4.app/Contents/Developer
       - name: Build and Test Framework
