@@ -44,7 +44,7 @@ final class DefaultFileLoader: FileLoader {
 		) {
 			var files: [String] = []
 			for case let fileURL as URL in enumerator where fileURL.lastPathComponent == name {
-				files.append(try String(contentsOf: fileURL))
+				try files.append(String(contentsOf: fileURL))
 			}
 			return files
 		} else {
