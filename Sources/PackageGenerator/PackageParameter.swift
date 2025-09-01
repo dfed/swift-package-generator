@@ -37,14 +37,19 @@ enum PackageParameter: String, CaseIterable {
 	/// - Returns: A single string representing the combined values for this Package parameter.
 	func combinedParameter(from values: [String]) throws -> String {
 		switch self {
+		case .targets:
+			return """
+			\(rawValue): [
+				\(values.joined(separator: ",\n"))
+			].flatMap(\\.self)
+			"""
 		case .cLanguageStandard,
 		     .cxxLanguageStandard,
 		     .dependencies,
 		     .platforms,
 		     .products,
 		     .providers,
-		     .swiftLanguageVersions,
-		     .targets:
+		     .swiftLanguageVersions:
 			return """
 			\(rawValue): [
 			    \(values.joined(separator: ",\n"))

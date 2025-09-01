@@ -179,5 +179,5 @@ let package = Package(
 			name: "Bar",
 			dependencies: [],
 		),
-	]
+	].flatMap(\.self)
 )
