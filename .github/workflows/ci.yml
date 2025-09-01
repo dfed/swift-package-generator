@@ -29,6 +29,8 @@ jobs:
       - name: Prepare Coverage Reports
         run: ./Scripts/prepare-coverage-reports.sh
       - name: Upload Coverage Reports
+        if: success()
+        uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true
           verbose: true
